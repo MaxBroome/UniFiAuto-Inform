@@ -29,9 +29,5 @@ if ($ubiquitiDevices.Count -eq 0) {
 else {
     Write-Host "Found $($ubiquitiDevices.Count) Ubiquiti Devices!" -ForegroundColor Green
 
-    foreach ($device in $ubiquitiDevices) {
-        $ip = $device.IPAddress
-        $mac = $device.MACAddress
-        Write-Host "IP Address: $($ip)" -ForegroundColor Blue
-    }
+    $ubiquitiDevices | Out-GridView
 }
