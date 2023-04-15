@@ -3,6 +3,8 @@ $macPrefixes = "00-15-6D", "00-27-22", "00-50-C2", "04-18-D6", "18-E8-29", "24-5
 $subnets = Read-Host "Please enter the first 3 octets of your subnet (e.g. 192.168.1)"
 
 Write-Host "Searching for Ubiquiti Devices..." -ForegroundColor Yellow
+Start-Sleep -Seconds 2
+Write-Host "This takes a while, running a full ping sweep on your network..." -ForegroundColor Red
 
 $pingJob = Start-Job -ScriptBlock {
     param($subnet)
@@ -44,4 +46,50 @@ else {
         $mac = $device.MACAddress
         Write-Host "IP Address: $($ip)" -ForegroundColor Blue
     }
+}
+
+$runCommand = Read-Host "Do you want to run the set-inform command on all devices? (Y/N)"
+if ($runCommand -eq "Y") {
+    $controller = Read-Host "What is the IP or FQDN of your UniFi Controller"
+    # Run set-inform command on all devices
+    foreach ($device in $ubiquitiDevices) {
+        $ip = $device.IPAddress
+        Write-Host "Running set-inform command on device $ip" -ForegroundColor Yellow
+        try {
+            $sshSession = New-SSHSession -ComputerName $ip -Credential (Get-Credential -UserName "ubnt" Password "ubnt")
+            $command = "set-inform http://${controller}:8080/inform"
+            $response = Invoke-SSHCommand -Index $sshSession.SessionId -Command $command -ErrorAction Stop
+            Write-Host "Successfully ran set-inform command on device $ip" -ForegroundColor Green
+            # Wait for response from the device
+            $stream = $sshSession.Session.CreateShellStream("PS-SSH", 0, 0, 0, 0, 1000)
+            $output = ""
+            while ($stream.Length -eq 0) {
+                Start-Sleep -Milliseconds 500
+            }
+            while (!$stream.EOF) {
+                $buffer = New-Object byte[] 1024
+                $count = $stream.Read($buffer, 0, 1024)
+                $output += ([System.Text.Encoding]::UTF8.GetString($buffer, 0, $count)).TrimEnd()
+            }
+            Write-Host "Response from device $ip $output" -ForegroundColor Green
+            # Wait for device to respond
+            $maxAttempts = 10
+            $attempts = 0
+            do {
+                Start-Sleep -Seconds 5
+                $ping = Test-Connection -ComputerName $ip -Count 1 -Quiet
+                $attempts++
+            } while (!$ping -and $attempts -lt $maxAttempts)
+            if ($ping) {
+                Write-Host "Device $ip responded to ping" -ForegroundColor Green
+            } else {
+                Write-Host "Device $ip did not respond to ping" -ForegroundColor Yellow
+            }
+            Remove-SSHSession -Index $sshSession.SessionId
+        } catch {
+            Write-Host "Failed to run set-inform command on device $ip" -ForegroundColor Red
+        }
+    }
+} else {
+    # Do nothing
 }
