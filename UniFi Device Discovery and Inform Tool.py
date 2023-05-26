@@ -5,8 +5,22 @@ import paramiko
 import time
 from threading import Thread, Lock
 from time import perf_counter
+from colorama import *
 
-print("Searching for Ubiquiti Devices...")
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+init(convert=True)
+
+print(f"{bcolors.UNDERLINE}Searching for Ubiquiti Devices...{bcolors.ENDC}")
 
 BASE_IP = "%s.%i"
 PORT = 8080
@@ -64,7 +78,7 @@ def get_gateway_octets():
 gateways = get_gateway_octets()
 
 total_ips = len(gateways) * 255
-n_threads = min(total_ips, 30)  # Set maximum of 30 threads
+n_threads = min(total_ips, 30)
 
 threader = Threader(n_threads)
 for gateway in gateways:
@@ -74,7 +88,6 @@ for gateway in gateways:
             threader.start()
             threader.join()
 
-# Start any remaining threads
 threader.start()
 threader.join()
 
@@ -108,40 +121,52 @@ for line in arp_output.splitlines():
                 break
 
 if len(ubiquiti_devices) == 0:
-    print("No Ubiquiti devices found.")
+    print(f"{bcolors.WARNING}No Ubiquiti devices found.){bcolors.ENDC}")
 else:
-    print(f"Found {len(ubiquiti_devices)} Ubiquiti Devices!")
+    print(f"{bcolors.OKGREEN}Found {len(ubiquiti_devices)} Ubiquiti Devices!{bcolors.ENDC}")
     for device in ubiquiti_devices:
         ip = device["IPAddress"]
         mac = device["MACAddress"]
-        print(f"IP Address: {ip}, MAC Address: {mac}")
+        print(f"{bcolors.OKBLUE}IP Address: {ip}, MAC Address: {mac}{bcolors.ENDC}")
 
 run_set_inform = input("Do you want to run a set-inform command on all devices? (y/n): ")
 
 if run_set_inform.lower() == "y":
-    controller_ip = input("Enter the IP address or FQDN of your UniFi controller: ")
+    use_custom_credentials = input(f"{bcolors.WARNING}Do you want to use custom SSH credentials? (y/n): {bcolors.ENDC}")
+
+    if use_custom_credentials.lower() == "y":
+        username = input("Enter the SSH username: ")
+        password = input("Enter the SSH password: ")
+    else:
+        username = "ubnt"
+        password = "ubnt"
+
+    controller_ip = input(f"{bcolors.HEADER}Enter the IP address or FQDN of your UniFi controller: {bcolors.ENDC}")
 
     for device in ubiquiti_devices:
         ip = device["IPAddress"]
-        username = "ubnt"
-        password = "ubnt"
 
         try:
             ssh_client = paramiko.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh_client.connect(ip, username=username, password=password)
 
-            time.sleep(0.5)  # Add a delay of .5 second
+            time.sleep(.5)  # Add a delay of half a second
 
             command = f"/usr/bin/mca-cli-op set-inform http://{controller_ip}:8080/inform"
             stdin, stdout, stderr = ssh_client.exec_command(command)
 
             success_output = "Adoption request sent to"
             if success_output in stdout.read().decode():
-                print(f"Set-inform command sent successfully to {ip}")
+                print(f"{bcolors.OKGREEN}Set-inform command sent successfully to {ip}{bcolors.ENDC}")
             else:
-                print(f"Failed to send set-inform command to {ip}")
+                print(f"{bcolors.FAIL}Failed to send set-inform command to {ip}{bcolors.ENDC}")
 
             ssh_client.close()
         except Exception as e:
-            print(f"Error connecting to {ip}: {str(e)}")
+            print(f"{bcolors.FAIL}Error connecting to {ip}: {str(e)}{bcolors.ENDC}")
+print(f"{bcolors.BOLD}Thank you for using my script!{bcolors.ENDC}")
+print("With <3  - MaxBroome on GitHub")
+time.sleep(3)
+print("Exiting Now! Bye!")
+time.sleep(5)
