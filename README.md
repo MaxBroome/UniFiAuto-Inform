@@ -8,6 +8,7 @@ This Python script helps you discover Ubiquiti devices on your network and provi
 
 - Python 3.11
 - Paramiko library (`pip install paramiko`)
+- nmap (`pip install nmap`)
 
 ## Usage
 
