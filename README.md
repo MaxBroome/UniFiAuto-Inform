@@ -6,24 +6,31 @@ This Python script helps you discover Ubiquiti devices on your network and provi
 
 ## Prerequisites
 
+*For the orginal command line tool:*
 - Python 3.11
 - Paramiko library (`pip install paramiko`)
-- nmap (`pip install python-nmap`)
+- nmap library (`pip install python-nmap`)
+
+**For the GUI script:**
+
+(You still need everything above as well!)
+- qdarkstyle library (`pip install qdarkstyle`)
+- PyQt5 library (`pip install qdarkstyle`)
 
 ## Usage
 
 1. Clone the repository or download the script file to your local machine.
 2. Open a terminal or command prompt and navigate to the directory where the script is located.
-3. Run the script using the Python interpreter: `python UniFi Device Discovery and Inform Tool.py`.
+3. Run the script using the Python interpreter with either: `python gui-tool.py` or `python command-line-tool.py` depending on your desired script.
 4. The script will run and search for Ubiquiti devices on your network and display the results.
 5. If you choose to run the `set-inform` command, follow the prompts to enter the required information, such as your UniFi controller's IP/FQDN and optional custom SSH credentials.
 
 ## Features
 
-- Automatic discovery of Ubiquiti devices using ARP scanning.
-- Multi-threaded scanning for faster discovery.
+- Automatic discovery of Ubiquiti devices using nmap.
+- nmap arguments to skip pings and invrease verbosity.
 - Option to run a `set-inform` command on all of the discovered devices.
-- Customizable SSH credentials for connecting to the devices.
+- Customizable SSH credentials for connecting to currently adopeted devices.
 
 ## Disclaimer
 
