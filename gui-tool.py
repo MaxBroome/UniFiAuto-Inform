@@ -82,7 +82,7 @@ class UbiquitiDeviceScannerApp(QWidget):
         self.devices_found = False
         self.devices_count = 0
 
-        self.setWindowTitle("Ubiquiti Device Scanner")
+        self.setWindowTitle("UniFi Auto-Inform Tool")
         self.setGeometry(100, 100, 500, 400)
 
         self.layout = QVBoxLayout()
