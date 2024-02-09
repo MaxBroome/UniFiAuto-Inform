@@ -6,16 +6,17 @@ This Python script helps you discover Ubiquiti devices on your network and provi
 
 ## Prerequisites
 
-*For the orginal command line tool:*
+**For the orginal command line tool:**
 - Python 3.11
 - Paramiko library (`pip install paramiko`)
 - nmap library (`pip install python-nmap`)
 
-**For the GUI script:**
+*For the GUI script:*
+(I'm pretty sure this is broken ATM)
 
 (You still need everything above as well!)
 - qdarkstyle library (`pip install qdarkstyle`)
-- PyQt5 library (`pip install qdarkstyle`)
+- PyQt5 library (`pip install PyQt5`)
 
 ## Usage
 
