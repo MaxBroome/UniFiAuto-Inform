@@ -2,7 +2,7 @@
 
 This Python script helps you discover Ubiquiti devices on your network and provides the option to run a `set-inform` command on all of the discovered devices at once.
 
-![](https://raw.githubusercontent.com/MaxBroome/HomelabHomepage/main/data/UniFi%20Tool.gif)
+![CLI Tool GIF](/tool.gif)
 
 ## Prerequisites
 
