@@ -75,6 +75,9 @@ if run_set_inform.lower() == "y":
         username = "ubnt"
         password = "ubnt"
 
+    if use_custom_credentials.lower() == "n":
+        exit
+
     controller_ip = input(f"{bcolors.HEADER}Enter the IP address or FQDN of your UniFi controller: {bcolors.ENDC}")
 
     for device in ubiquiti_devices:
