@@ -8,8 +8,15 @@ This Python script helps you discover Ubiquiti devices on your network and provi
 
 **For the orginal command line tool:**
 - Python 3.11
+- Nmap application ([nmap.org/download](https://nmap.org/download))
 - Paramiko library (`pip install paramiko`)
 - nmap library (`pip install python-nmap`)
+- Colorama library (`pip install colorama`)
+
+#### Install all dependencies with a single command:
+```bash
+pip install paramiko python-nmap colorama
+```
 
 *For the GUI script:*
 (I'm pretty sure this is broken ATM)
@@ -32,6 +39,7 @@ This Python script helps you discover Ubiquiti devices on your network and provi
 - nmap arguments to skip pings and invrease verbosity.
 - Option to run a `set-inform` command on all of the discovered devices.
 - Customizable SSH credentials for connecting to currently adopeted devices.
+- -- manual flag to enter a subnet manually. use this by running `python command-line-tool.py --manual`
 
 ## Disclaimer
 
