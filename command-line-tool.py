@@ -2,6 +2,7 @@ import socket
 import paramiko
 import time
 import nmap
+import argparse
 from colorama import *
 
 class bcolors:
@@ -14,13 +15,21 @@ class bcolors:
 
 init(convert=True)
 
-# Get the user's LAN IP to use for the nmap scan.
-# This can be weird sometimes, and only works for /24 subnets. I will add an override for this in the coming GUI release.
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.connect(("1.1.1.1", 80))
-local_ip = s.getsockname()[0]
-split_ip = local_ip.rsplit(".", 1)
-target_ip = split_ip[0] + ".0/24"
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Ubiquiti Device Finder Script")
+parser.add_argument("--manual", action="store_true", help="Manually enter the subnet in CIDR notation")
+args = parser.parse_args()
+
+# Get the user's LAN IP to use for the nmap scan or ask for manual input
+if args.manual:
+    print ((f"{bcolors.OKGREEN}Manual mode detected!{bcolors.ENDC}"))
+    target_ip = input("Enter the subnet in CIDR notation (e.g., 192.168.1.0/24): ")
+else:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("1.1.1.1", 80))
+    local_ip = s.getsockname()[0]
+    split_ip = local_ip.rsplit(".", 1)
+    target_ip = split_ip[0] + ".0/24"
 
 print(f"Searching for Ubiquiti Devices in {bcolors.HEADER}{target_ip}{bcolors.ENDC}...")
 
